@@ -220,6 +220,7 @@ void IN_SetRelativeMouseMode( qboolean set )
 #if XASH_SDL >= 2
 		SDL_GetRelativeMouseState( NULL, NULL );
 #if XASH_SDL == 2
+		SDL_SetHint( SDL_HINT_MOUSE_RELATIVE_MODE_WARP, "1" );
 		SDL_SetRelativeMouseMode( SDL_TRUE );
 #else // XASH_SDL != 2
 		SDL_SetWindowRelativeMouseMode( host.hWnd, true );
