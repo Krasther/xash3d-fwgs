@@ -44,6 +44,7 @@ CVAR_DEFINE_AUTO( m_yaw, "0.022", FCVAR_ARCHIVE | FCVAR_FILTERABLE, "mouse yaw v
 CVAR_DEFINE_AUTO( m_ignore, DEFAULT_M_IGNORE, FCVAR_ARCHIVE | FCVAR_FILTERABLE, "ignore mouse events" );
 static CVAR_DEFINE_AUTO( look_filter, "0", FCVAR_ARCHIVE | FCVAR_FILTERABLE, "filter look events making it smoother" );
 static CVAR_DEFINE_AUTO( m_rawinput, "1", FCVAR_ARCHIVE | FCVAR_FILTERABLE, "enable mouse raw input" );
+static CVAR_DEFINE_AUTO( m_relscale, "1", FCVAR_FILTERABLE, "diagnostic relative mouse delta scale" );
 
 static CVAR_DEFINE_AUTO( cl_forwardspeed, "400", FCVAR_ARCHIVE | FCVAR_CLIENTDLL | FCVAR_FILTERABLE, "Default forward move speed" );
 static CVAR_DEFINE_AUTO( cl_backspeed, "400", FCVAR_ARCHIVE | FCVAR_CLIENTDLL | FCVAR_FILTERABLE, "Default back move speed"  );
@@ -121,6 +122,7 @@ static void IN_StartupMouse( void )
 	Cvar_RegisterVariable( &m_yaw );
 	Cvar_RegisterVariable( &look_filter );
 	Cvar_RegisterVariable( &m_rawinput );
+	Cvar_RegisterVariable( &m_relscale );
 	Cvar_RegisterVariable( &m_grab_debug );
 	Cvar_RegisterVariable( &touch_enable );
 
@@ -581,6 +583,8 @@ static void IN_CollectInput( float *forward, float *side, float *pitch, float *y
 	{
 		float x, y;
 		Platform_MouseMove( &x, &y );
+		x *= m_relscale.value;
+		y *= m_relscale.value;
 		*pitch += y * m_pitch.value;
 		*yaw   -= x * m_yaw.value;
 
