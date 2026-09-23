@@ -180,8 +180,16 @@ static void SDLash_MouseEvent( SDL_MouseButtonEvent button )
 {
 	int down;
 
+#if XASH_ANDROID
+	// On some Android devices the primary button of a physical mouse can be tagged
+	// as SDL_TOUCH_MOUSEID. Let LEFT through so it can reach MOUSE1; synthetic
+	// touch->mouse events are disabled separately by SDL_HINT_TOUCH_MOUSE_EVENTS.
+	if( button.which == SDL_TOUCH_MOUSEID && button.button != SDL_BUTTON_LEFT )
+		return;
+#else
 	if( button.which == SDL_TOUCH_MOUSEID )
 		return;
+#endif
 
 	if( button.state == SDL_RELEASED )
 		down = 0;
