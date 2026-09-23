@@ -102,6 +102,13 @@ void Touch_NotifyResize( void );
 #endif
 
 //
+// in_commandmenu.c
+//
+void CommandMenu_Init( void );
+qboolean CommandMenu_KeyEvent( int key, int down );
+void CommandMenu_Draw( void );
+
+//
 // in_osk.c
 //
 extern convar_t osk_enable;
