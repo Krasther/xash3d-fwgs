@@ -127,6 +127,8 @@ static qboolean CommandMenu_ParseFile( void )
 	byte *source;
 	char *cursor;
 	char token[MAX_TOKEN];
+	char pendingToken[MAX_TOKEN] = "";
+	qboolean havePendingToken = false;
 	int currentNode = 0;
 
 	CommandMenu_Reset();
@@ -144,8 +146,19 @@ static qboolean CommandMenu_ParseFile( void )
 	if( fileLength >= 3 && source[0] == 0xef && source[1] == 0xbb && source[2] == 0xbf )
 		cursor += 3;
 
-	while(( cursor = CommandMenu_ParseToken( cursor, token, sizeof( token ))) != NULL && token[0] )
+	while( true )
 	{
+		if( havePendingToken )
+		{
+			Q_strncpy( token, pendingToken, sizeof( token ));
+			havePendingToken = false;
+		}
+		else
+		{
+			cursor = CommandMenu_ParseToken( cursor, token, sizeof( token ));
+			if( !cursor || !token[0] )
+				break;
+		}
 		char mapName[64] = "";
 		int teamOnly = -1;
 		qboolean toggle = false;
@@ -200,6 +213,30 @@ static qboolean CommandMenu_ParseFile( void )
 
 		cursor = CommandMenu_ParseToken( cursor, command, sizeof( command ));
 		if( !cursor ) break;
+
+		/*
+		 * GoldSrc CUSTOM buttons consume one extra token to determine whether
+		 * the custom entry owns a submenu. If it is not "{", preserve it as
+		 * the first token of the next entry. This matters for ZBot command
+		 * menus, which commonly use CUSTOM wrappers around nested menus.
+		 */
+		if( custom )
+		{
+			char nextToken[MAX_TOKEN];
+			char *nextCursor = CommandMenu_ParseToken( cursor, nextToken, sizeof( nextToken ));
+
+			if( nextCursor && !Q_strcmp( nextToken, "{" ))
+			{
+				Q_strncpy( command, "{", sizeof( command ));
+				cursor = nextCursor;
+			}
+			else if( nextCursor )
+			{
+				Q_strncpy( pendingToken, nextToken, sizeof( pendingToken ));
+				havePendingToken = true;
+				cursor = nextCursor;
+			}
+		}
 
 		if( custom && !Q_stricmp( command, "!CHANGETEAM" ))
 			Q_strncpy( command, "chooseteam", sizeof( command ));
