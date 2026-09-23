@@ -558,6 +558,7 @@ void V_PostRender( void )
 		SV_DrawOrthoTriangles();
 		CL_DrawDemoRecording();
 		CL_DrawHUD( CL_CHANGELEVEL );
+		CommandMenu_Draw();
 		ref.dllFuncs.R_ShowTextures();
 		R_ShowTree();
 		UI_UpdateMenu( host.realtime );
