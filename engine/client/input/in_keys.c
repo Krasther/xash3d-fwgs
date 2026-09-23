@@ -573,6 +573,7 @@ void Key_Init( void )
 		Key_SetBinding( keynames[i].keynum, keynames[i].binding );
 
 	Cvar_RegisterVariable( &key_rotate );
+	CommandMenu_Init();
 
 }
 
@@ -697,6 +698,9 @@ Called by the system for both key up and key down events
 void GAME_EXPORT Key_Event( int key, int down )
 {
 	key = Key_Rotate( key );
+
+	if( CommandMenu_KeyEvent( key, down ) )
+		return;
 
 	if( OSK_KeyEvent( key, down ) )
 		return;
