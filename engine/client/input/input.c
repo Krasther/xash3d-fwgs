@@ -44,7 +44,7 @@ CVAR_DEFINE_AUTO( m_yaw, "0.022", FCVAR_ARCHIVE | FCVAR_FILTERABLE, "mouse yaw v
 CVAR_DEFINE_AUTO( m_ignore, DEFAULT_M_IGNORE, FCVAR_ARCHIVE | FCVAR_FILTERABLE, "ignore mouse events" );
 static CVAR_DEFINE_AUTO( look_filter, "0", FCVAR_ARCHIVE | FCVAR_FILTERABLE, "filter look events making it smoother" );
 static CVAR_DEFINE_AUTO( m_rawinput, "1", FCVAR_ARCHIVE | FCVAR_FILTERABLE, "enable mouse raw input" );
-static CVAR_DEFINE_AUTO( m_relscale, "1", FCVAR_FILTERABLE, "diagnostic relative mouse delta scale" );
+static CVAR_DEFINE_AUTO( m_relscale, "1", FCVAR_ARCHIVE | FCVAR_FILTERABLE, "diagnostic relative mouse delta scale" );
 
 static CVAR_DEFINE_AUTO( cl_forwardspeed, "400", FCVAR_ARCHIVE | FCVAR_CLIENTDLL | FCVAR_FILTERABLE, "Default forward move speed" );
 static CVAR_DEFINE_AUTO( cl_backspeed, "400", FCVAR_ARCHIVE | FCVAR_CLIENTDLL | FCVAR_FILTERABLE, "Default back move speed"  );
@@ -125,6 +125,13 @@ static void IN_StartupMouse( void )
 	Cvar_RegisterVariable( &m_relscale );
 	Cvar_RegisterVariable( &m_grab_debug );
 	Cvar_RegisterVariable( &touch_enable );
+
+#if XASH_ANDROID && XASH_SDL == 2
+	// Keep hardware mouse and touchscreen events separate on Android.
+	// This avoids the primary mouse button being mirrored/consumed as touch input.
+	SDL_SetHint( SDL_HINT_MOUSE_TOUCH_EVENTS, "0" );
+	SDL_SetHint( SDL_HINT_TOUCH_MOUSE_EVENTS, "0" );
+#endif
 
 	// You can use -nomouse argument to prevent using mouse from client
 	// -noenginemouse will disable all mouse input
